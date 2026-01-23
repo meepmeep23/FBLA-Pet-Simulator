@@ -1,0 +1,353 @@
+[gd_scene load_steps=9 format=3 uid="uid://djh4qxo4616ct"]
+
+[ext_resource type="Script" uid="uid://bafesf7a1wp3y" path="res://Scripts/mines.gd" id="1_eek8p"]
+[ext_resource type="Script" uid="uid://die0eus2vab4l" path="res://Scripts/sceneLoadingOnButton.gd" id="2_62umr"]
+[ext_resource type="AudioStream" uid="uid://cbu5j7ikjppqn" path="res://Sounds/downer_noise.mp3" id="3_8tjyi"]
+
+[sub_resource type="Animation" id="Animation_8tjyi"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Effect Label:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(898, 354)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Effect Label:self_modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_62umr"]
+resource_name = "effect fade in"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Effect Label:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.56666666),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(898, 354), Vector2(898, 232)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Effect Label:self_modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.33333334, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8tjyi"]
+_data = {
+&"RESET": SubResource("Animation_8tjyi"),
+&"effect fade in": SubResource("Animation_62umr")
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ducuk"]
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eieuh"]
+albedo_color = Color(0.1584723, 0.15847233, 0.1584723, 1)
+
+[node name="Mines" type="Node3D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 540)
+
+[node name="Ui" type="TabContainer" parent="."]
+offset_top = -38.0
+offset_right = 1920.0
+offset_bottom = 1082.0
+current_tab = 0
+script = ExtResource("1_eek8p")
+miningTime = 100.0
+
+[node name="Duck Selection" type="Control" parent="Ui"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="SelectionLabel" type="RichTextLabel" parent="Ui/Duck Selection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 102.0
+offset_bottom = 153.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 66
+text = "What Brave Duck Will Be Going On This Expedition?"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+
+[node name="DuckList" type="ItemList" parent="Ui/Duck Selection"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -110.0
+offset_top = 335.0
+offset_right = 110.0
+offset_bottom = 635.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 61
+auto_width = true
+
+[node name="Exit" type="Button" parent="Ui/Duck Selection"]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 26.0
+offset_right = 151.14
+offset_bottom = 79.0
+theme_override_font_sizes/font_size = 32
+text = "Exit"
+script = ExtResource("2_62umr")
+sceneToLoad = "test_arena"
+
+[node name="Continue" type="Button" parent="Ui/Duck Selection"]
+layout_mode = 0
+offset_left = 1386.0
+offset_top = 871.0
+offset_right = 1618.0
+offset_bottom = 949.0
+theme_override_font_sizes/font_size = 50
+text = "Continue"
+
+[node name="ReturnTimer" type="Control" parent="Ui"]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ReturnTime" type="RichTextLabel" parent="Ui/ReturnTimer"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -550.0
+offset_top = 81.0
+offset_right = 550.0
+offset_bottom = 186.0
+grow_horizontal = 2
+theme_override_font_sizes/normal_font_size = 76
+text = "Blank will return in x minutes."
+fit_content = true
+autowrap_mode = 0
+
+[node name="Effect Label" type="RichTextLabel" parent="Ui/ReturnTimer"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 898.0
+offset_top = 354.0
+offset_right = 1063.0
+offset_bottom = 424.0
+bbcode_enabled = true
+text = "Effects"
+
+[node name="Exit" type="Button" parent="Ui/ReturnTimer"]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 26.0
+offset_right = 151.14
+offset_bottom = 79.0
+theme_override_font_sizes/font_size = 32
+text = "Exit"
+script = ExtResource("2_62umr")
+sceneToLoad = "test_arena"
+
+[node name="MiniGame Options" type="Control" parent="Ui/ReturnTimer"]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="Option1" type="Button" parent="Ui/ReturnTimer/MiniGame Options"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 295.0
+offset_top = 299.0
+offset_right = 713.3
+offset_bottom = 753.39
+
+[node name="Option3" type="Button" parent="Ui/ReturnTimer/MiniGame Options"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 1201.0
+offset_top = 300.0
+offset_right = 1617.125
+offset_bottom = 754.39
+
+[node name="Option2" type="Button" parent="Ui/ReturnTimer/MiniGame Options"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 811.0
+offset_top = 313.0
+offset_right = 1111.0
+offset_bottom = 707.54504
+
+[node name="Effect Animation" type="AnimationPlayer" parent="Ui/ReturnTimer"]
+libraries = {
+&"": SubResource("AnimationLibrary_8tjyi")
+}
+
+[node name="MiniGameSoundEffects" type="AudioStreamPlayer2D" parent="Ui/ReturnTimer"]
+stream = ExtResource("3_8tjyi")
+
+[node name="ObtainMinerals" type="Control" parent="Ui"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="ReturnTime" type="RichTextLabel" parent="Ui/ObtainMinerals"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -755.0
+offset_top = 177.0
+offset_right = 755.0
+offset_bottom = 282.0
+grow_horizontal = 2
+theme_override_font_sizes/normal_font_size = 76
+bbcode_enabled = true
+text = "Your duck has returned with many resources!"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Collect" type="Button" parent="Ui/ObtainMinerals"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -169.0
+offset_top = -73.0
+offset_right = 169.0
+offset_bottom = 73.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 101
+text = "Collect"
+
+[node name="ItemList" type="ItemList" parent="Ui/ObtainMinerals"]
+layout_mode = 0
+offset_left = 149.0
+offset_top = 430.0
+offset_right = 524.105
+offset_bottom = 946.35
+
+[node name="ErrorText" type="RichTextLabel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 874.0
+offset_top = 847.0
+offset_right = -646.0
+offset_bottom = -33.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/default_color = Color(1, 0, 0, 1)
+fit_content = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.98207736, 0.18847843, 0, -0.18847843, 0.98207736, 0, 1.3522396, 3.3638477)
+
+[node name="Option 2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5.874)
+size = Vector3(3.495, 4.695, 1)
+material = SubResource("StandardMaterial3D_ducuk")
+
+[node name="Option 1" type="CSGBox3D" parent="."]
+transform = Transform3D(0.8616291, 0, -0.5075384, 0, 1, 0, 0.5075384, 0, 0.8616291, 5, 0, -4.894)
+size = Vector3(3.495, 4.695, 1)
+material = SubResource("StandardMaterial3D_ducuk")
+
+[node name="Option 3" type="CSGBox3D" parent="."]
+transform = Transform3D(0.8616291, 0, 0.5075384, 0, 1, 0, -0.5075384, 0, 0.8616291, -5, 0, -4.894)
+material_override = SubResource("StandardMaterial3D_ducuk")
+size = Vector3(3.495, 4.695, 1)
+
+[node name="Main" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.31, -0.899)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(16.771, 0.166, 11.532)
+
+[node name="Main2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.3790255, 3.1101422, -0.899)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(1.0994892, 11.006285, 11.532)
+
+[node name="Main4" type="CSGBox3D" parent="."]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.14839172, 0.15771818, -6.0332727)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(1.0994892, 5.1014366, 14.468571)
+
+[node name="Main9" type="CSGBox3D" parent="."]
+transform = Transform3D(-4.0669846e-08, 1.6020277e-08, 1, 0.3665012, 0.9304176, 0, -0.9304176, 0.3665012, -4.371139e-08, 0.14839172, 4.2938685, -5.2124605)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(1.0994892, 5.1014366, 14.468571)
+
+[node name="Main5" type="CSGBox3D" parent="."]
+transform = Transform3D(0.49999994, 0, 0.8660254, 0, 1, 0, -0.8660254, 0, 0.49999994, 3.239518, 0.15771818, -6.0332727)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(1.0994892, 5.1014366, 14.468571)
+
+[node name="Main7" type="CSGBox3D" parent="."]
+transform = Transform3D(0.46520874, -0.18325059, 0.8660254, 0.36650118, 0.9304176, 0, -0.8057653, 0.31739938, 0.49999994, 3.2395184, 4.5112495, -5.176215)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(1.0994892, 5.1014366, 14.468571)
+
+[node name="Main6" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.5, 0, 0.8660253, 0, 1, 0, -0.8660253, 0, -0.5, -3.7998574, 0.15771818, -6.0332727)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(1.0994892, 5.1014366, 14.468571)
+
+[node name="Main8" type="CSGBox3D" parent="."]
+transform = Transform3D(-0.46520883, 0.18325062, 0.8660253, 0.36650118, 0.9304176, 0, -0.8057652, 0.31739935, -0.5, -3.7998574, 2.738954, -6.0332727)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(1.0994892, 9.019468, 14.468571)
+
+[node name="Main3" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.366173, 3.0478253, -0.899)
+material_override = SubResource("StandardMaterial3D_eieuh")
+size = Vector3(1.0994892, 10.881651, 11.532)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0)
+light_energy = 3.155
+omni_range = 18.87
+omni_attenuation = 1.005
+
+[connection signal="item_clicked" from="Ui/Duck Selection/DuckList" to="Ui" method="_on_duck_list_item_clicked"]
+[connection signal="pressed" from="Ui/Duck Selection/Exit" to="Ui/Duck Selection/Exit" method="_on_pressed"]
+[connection signal="pressed" from="Ui/Duck Selection/Continue" to="Ui" method="_on_continue_pressed"]
+[connection signal="pressed" from="Ui/ReturnTimer/Exit" to="Ui/ReturnTimer/Exit" method="_on_pressed"]
+[connection signal="pressed" from="Ui/ReturnTimer/MiniGame Options/Option1" to="Ui" method="_on_option_1_pressed"]
+[connection signal="pressed" from="Ui/ReturnTimer/MiniGame Options/Option3" to="Ui" method="_on_option_3_pressed"]
+[connection signal="pressed" from="Ui/ReturnTimer/MiniGame Options/Option2" to="Ui" method="_on_option_2_pressed"]
+[connection signal="pressed" from="Ui/ObtainMinerals/Collect" to="Ui" method="_on_collect_pressed"]

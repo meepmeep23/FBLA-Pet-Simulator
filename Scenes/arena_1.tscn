@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3 uid="uid://bsegsf03takhi"]
+
+[ext_resource type="Script" uid="uid://hifk3thhnm3q" path="res://Scripts/ScriptToDelete.gd" id="1_6tcsd"]
+[ext_resource type="PackedScene" uid="uid://c8ta6o0v6iucc" path="res://Objects/ducky_meshes.tscn" id="2_ybuk8"]
+[ext_resource type="Script" uid="uid://fpqkfdnoj6ha" path="res://Scripts/target.gd" id="3_ybuk8"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_6tcsd"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_ybuk8"]
+sky_material = SubResource("ProceduralSkyMaterial_6tcsd")
+
+[sub_resource type="Environment" id="Environment_0n7hn"]
+background_mode = 2
+sky = SubResource("Sky_ybuk8")
+tonemap_mode = 2
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_6tcsd"]
+
+[node name="Arena1" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0n7hn")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." node_paths=PackedStringArray("target")]
+script = ExtResource("1_6tcsd")
+target = NodePath("../Target")
+attackSpeed = 3.0
+maxHeight = 5.0
+
+[node name="Ducky Meshes" parent="CharacterBody3D" instance=ExtResource("2_ybuk8")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+
+[node name="Target" type="CharacterBody3D" parent="." groups=["enemy"]]
+transform = Transform3D(0.18, 0, 0, 0, 0.18, 0, 0, 0, 0.18, 3.081, 0, -2.146)
+script = ExtResource("3_ybuk8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Target"]
+shape = SubResource("SphereShape3D_6tcsd")
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="Target"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.65740013, 0.29388046, -0.69387275, 0, 0.9208153, 0.38999894, 0.7535417, 0.25638536, -0.6053441, -1.0188596, 3.9132576, -5.9861994)
