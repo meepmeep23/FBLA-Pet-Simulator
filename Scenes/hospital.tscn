@@ -1,0 +1,263 @@
+[gd_scene load_steps=7 format=3 uid="uid://dpb0ya8xj2bcl"]
+
+[ext_resource type="Script" uid="uid://ckulponpm4ujc" path="res://Scripts/hospitalUI.gd" id="1_6cpib"]
+[ext_resource type="Script" uid="uid://die0eus2vab4l" path="res://Scripts/sceneLoadingOnButton.gd" id="2_lx58d"]
+[ext_resource type="Script" uid="uid://bo6iy6fap4qtl" path="res://Scripts/return.gd" id="3_lx58d"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6cpib"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lx58d"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lx58d"]
+albedo_color = Color(0.19607843, 0.56078434, 0.84313726, 1)
+
+[node name="hospital" type="Node3D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 540)
+
+[node name="Ui" type="TabContainer" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+offset_top = -38.0
+offset_right = 1920.0
+offset_bottom = 1082.0
+current_tab = 0
+script = ExtResource("1_6cpib")
+
+[node name="Starting UI" type="Control" parent="Ui"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Exit" type="Button" parent="Ui/Starting UI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = 42.5
+offset_right = 59.140015
+offset_bottom = 95.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Exit"
+script = ExtResource("2_lx58d")
+sceneToLoad = "test_arena"
+
+[node name="ViewDucks" type="Button" parent="Ui/Starting UI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -91.5
+offset_top = -26.5
+offset_right = 91.5
+offset_bottom = 26.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "View Ducks"
+
+[node name="Order A Checkup" type="Button" parent="Ui/Starting UI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -135.0
+offset_top = -90.5
+offset_right = 135.0
+offset_bottom = -37.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Order A Checkup"
+
+[node name="Duck Checkup" type="Control" parent="Ui"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Return" type="Button" parent="Ui/Duck Checkup"]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 26.0
+offset_right = 252.49
+offset_bottom = 79.0
+theme_override_font_sizes/font_size = 32
+text = "Exit Hospital"
+script = ExtResource("3_lx58d")
+
+[node name="Possible Ducks To Check On" type="ItemList" parent="Ui/Duck Checkup"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -147.5
+offset_right = 200.0
+offset_bottom = 352.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main Label" type="Label" parent="Ui/Duck Checkup"]
+layout_mode = 0
+offset_left = 425.0
+offset_top = 186.0
+offset_right = 1483.0
+offset_bottom = 269.0
+theme_override_font_sizes/font_size = 60
+text = "What duck do you want to check on?"
+
+[node name="Mini Label" type="Label" parent="Ui/Duck Checkup"]
+layout_mode = 0
+offset_left = 709.0
+offset_top = 264.0
+offset_right = 1767.0
+offset_bottom = 347.0
+theme_override_colors/font_color = Color(0.46618086, 0.4661808, 0.4661808, 1)
+theme_override_font_sizes/font_size = 50
+text = "$50 per check-up, extra fees may apply"
+
+[node name="Money Label" type="Label" parent="Ui/Duck Checkup"]
+layout_mode = 0
+offset_left = 1633.0
+offset_top = 20.0
+offset_right = 1892.0
+offset_bottom = 103.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 50
+text = "$500"
+horizontal_alignment = 2
+
+[node name="Results" type="Control" parent="Ui"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Test Header" type="Label" parent="Ui/Results"]
+z_index = 1
+layout_mode = 0
+offset_left = 680.0
+offset_top = 44.0
+offset_right = 1379.0
+offset_bottom = 210.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 100
+text = "Test Results"
+
+[node name="Body Text" type="RichTextLabel" parent="Ui/Results"]
+z_index = 1
+layout_mode = 0
+offset_left = 641.0
+offset_top = 221.0
+offset_right = 1340.0
+offset_bottom = 1052.79
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 60
+bbcode_enabled = true
+text = "Your Duck's test results have come back..............
+[color=Red] Positive for Syphilis[/color]
+
+Your Duck has been placed in the hospital's care, a fee of $1000 dollars has been placed on your account."
+autowrap_mode = 2
+
+[node name="Paper" type="Panel" parent="Ui/Results"]
+layout_mode = 0
+offset_left = 594.0
+offset_top = 34.0
+offset_right = 1369.0
+offset_bottom = 1034.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_6cpib")
+
+[node name="Top of Paper" type="Panel" parent="Ui/Results"]
+layout_mode = 0
+offset_left = 594.0
+offset_top = 34.0
+offset_right = 1369.0
+offset_bottom = 206.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_lx58d")
+
+[node name="Return" type="Button" parent="Ui/Results"]
+layout_mode = 0
+offset_left = 132.0
+offset_top = 836.0
+offset_right = 411.545
+offset_bottom = 969.0
+theme_override_font_sizes/font_size = 91
+text = "Next"
+script = ExtResource("3_lx58d")
+
+[node name="ViewDucks" type="Control" parent="Ui"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="3D" type="Node3D" parent="Ui/ViewDucks"]
+
+[node name="Beds" type="Node3D" parent="Ui/ViewDucks/3D"]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="Left Wall" type="Node3D" parent="Ui/ViewDucks/3D"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Ui/ViewDucks/3D/Left Wall"]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.84499985, 2.33, 3.683)
+size = Vector3(1, 7.7071533, 11.934326)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Ui/ViewDucks/3D/Left Wall"]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.84499985, 2.33, 3.683)
+size = Vector3(1.0615234, 0.7805557, 11.934326)
+material = SubResource("StandardMaterial3D_lx58d")
+
+[node name="Right Wall" type="Node3D" parent="Ui/ViewDucks/3D"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Ui/ViewDucks/3D/Right Wall"]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.84499985, 2.33, 3.683)
+size = Vector3(1, 7.7071533, 11.934326)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Ui/ViewDucks/3D/Right Wall"]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.84499985, 2.33, 3.683)
+size = Vector3(1.0615234, 0.7805557, 11.934326)
+material = SubResource("StandardMaterial3D_lx58d")
+
+[node name="Camera3D" type="Camera3D" parent="Ui/ViewDucks/3D"]
+transform = Transform3D(-2.4450053e-08, -0.8289302, 0.55935204, -3.623369e-08, 0.55935204, 0.8289302, -1, 0, -4.3711385e-08, 3.51, 6.174, 0.20000015)
+
+[node name="Return" type="Button" parent="Ui/ViewDucks"]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 37.0
+offset_right = 242.0
+offset_bottom = 115.0
+theme_override_font_sizes/font_size = 51
+text = "Return"
+script = ExtResource("3_lx58d")
+
+[node name="ErrorText" type="RichTextLabel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 874.0
+offset_top = 847.0
+offset_right = -646.0
+offset_bottom = -33.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/default_color = Color(1, 0, 0, 1)
+fit_content = true
+
+[connection signal="pressed" from="Ui/Starting UI/Exit" to="Ui/Starting UI/Exit" method="_on_pressed"]
+[connection signal="pressed" from="Ui/Starting UI/ViewDucks" to="Ui" method="_on_view_ducks_pressed"]
+[connection signal="pressed" from="Ui/Starting UI/Order A Checkup" to="Ui" method="_on_order_a_checkup_pressed"]
+[connection signal="pressed" from="Ui/Duck Checkup/Return" to="Ui/Duck Checkup/Return" method="_on_pressed"]
+[connection signal="item_clicked" from="Ui/Duck Checkup/Possible Ducks To Check On" to="Ui" method="_on_possible_ducks_to_check_on_item_clicked"]
+[connection signal="pressed" from="Ui/Results/Return" to="Ui/Results/Return" method="_on_pressed"]
+[connection signal="pressed" from="Ui/ViewDucks/Return" to="Ui/ViewDucks/Return" method="_on_pressed"]
