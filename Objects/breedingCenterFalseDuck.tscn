@@ -1,0 +1,291 @@
+[gd_scene load_steps=15 format=3 uid="uid://ptmi2cxbtcbh"]
+
+[ext_resource type="Script" uid="uid://bolc5h15og5s0" path="res://Scripts/BreedingCenterFalseDuckScript.gd" id="1_0vhl5"]
+[ext_resource type="PackedScene" uid="uid://c8ta6o0v6iucc" path="res://Objects/ducky_meshes.tscn" id="2_yghiq"]
+[ext_resource type="PackedScene" uid="uid://b0xe46ouiquce" path="res://Objects/egg_meshes.tscn" id="4_1mikd"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_23i1v"]
+radius = 0.765
+height = 2.4040527
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_mtho8"]
+viewport_path = NodePath("3D Gui/SubViewport")
+
+[sub_resource type="Environment" id="Environment_23i1v"]
+
+[sub_resource type="World3D" id="World3D_yja8e"]
+environment = SubResource("Environment_23i1v")
+
+[sub_resource type="Animation" id="Animation_yja8e"]
+resource_name = "Egg Hatch"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Egg Meshes:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.23333333, 3.21, 3.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [true, true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Egg Meshes:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 3, 3.16, 3.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(1.33, 1.33, 1.33), Vector3(1.33, 1.33, 1.33), Vector3(1.33, 1.33, 1.33), Vector3(0.1, 0.1, 0.1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(3.16, 3.83),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.3, 0.3, 0.3), Vector3(0.44, 0.44, 0.44)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Egg Meshes:rotation")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.16),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1.0000005, 1, 1, 1, 1.0000005, 1, 1, 1, 1.0000005, 1.0000005),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, -0.5061455), Vector3(0, 0, 0), Vector3(0, 0, 0.5061455), Vector3(0, 0, 0), Vector3(0, 0, -0.5061455), Vector3(0, 0, 0), Vector3(0, 0, 0.5061455), Vector3(0, 0, 0), Vector3(0, 0, -0.5061455), Vector3(0, 0, 0), Vector3(0, 0, 0.5061455), Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("CPUParticles3D:emitting")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(3.2),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_en616"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Egg Meshes:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Egg Meshes:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1.33, 1.33, 1.33)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.1, 0.1, 0.1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Egg Meshes:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("CPUParticles3D:emitting")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_en616"]
+_data = {
+&"Egg Hatch": SubResource("Animation_yja8e"),
+&"RESET": SubResource("Animation_en616")
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yja8e"]
+render_priority = 1
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+grow = true
+grow_amount = 0.01
+stencil_mode = 3
+stencil_flags = 1
+stencil_compare = 5
+metadata/_stencil_owned = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_en616"]
+next_pass = SubResource("StandardMaterial3D_yja8e")
+specular_mode = 1
+albedo_color = Color(0.728822, 0.728822, 0.728822, 1)
+distance_fade_max_distance = 0.8
+stencil_mode = 1
+stencil_flags = 2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_w6qog"]
+material = SubResource("StandardMaterial3D_en616")
+radius = 0.05
+height = 0.1
+
+[sub_resource type="Curve" id="Curve_yja8e"]
+_data = [Vector2(0, 0.3370787), 0.0, 0.0, 0, 0, Vector2(0.57277, 0.6741574), 0.0, 0.0, 0, 0, Vector2(0.92488265, 0.022471905), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[node name="BreedingCenterDuck" type="CharacterBody3D"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+script = ExtResource("1_0vhl5")
+
+[node name="Ducky Meshes" parent="." instance=ExtResource("2_yghiq")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.018359661, 0.436472, -0.34430605)
+shape = SubResource("CapsuleShape3D_23i1v")
+
+[node name="Raycasts" type="Node3D" parent="."]
+transform = Transform3D(0.825, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="1" type="RayCast3D" parent="Raycasts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9169514, 0.24095267, 1.1901351)
+target_position = Vector3(0, 0, -2)
+collision_mask = 2
+
+[node name="2" type="RayCast3D" parent="Raycasts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.96712947, 0.24095267, 1.1901351)
+target_position = Vector3(0, 0, -2)
+collision_mask = 2
+
+[node name="3D Gui" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+billboard = 1
+no_depth_test = true
+fixed_size = true
+texture = SubResource("ViewportTexture_mtho8")
+
+[node name="SubViewport" type="SubViewport" parent="3D Gui"]
+own_world_3d = true
+world_3d = SubResource("World3D_yja8e")
+transparent_bg = true
+gui_disable_input = true
+size = Vector2i(261, 174)
+render_target_update_mode = 4
+
+[node name="Ui Parent" type="Control" parent="3D Gui/SubViewport"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Name" type="RichTextLabel" parent="3D Gui/SubViewport/Ui Parent"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -169.135
+offset_top = -56.1
+offset_right = 86.865005
+offset_bottom = 199.89975
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
+text = "DuckName"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Age" type="RichTextLabel" parent="3D Gui/SubViewport/Ui Parent"]
+layout_mode = 0
+offset_left = 31.394
+offset_top = -55.741
+offset_right = 131.39404
+offset_bottom = 200.25897
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
+text = "67 Years Old"
+autowrap_mode = 2
+horizontal_alignment = 2
+
+[node name="Egg Meshes" parent="." instance=ExtResource("4_1mikd")]
+transform = Transform3D(1.33, 0, 0, 0, 1.33, 0, 0, 0, 1.33, 0, 0.71749115, -0.07253374)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_en616")
+}
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 50
+lifetime = 2.1999999999999997
+one_shot = true
+speed_scale = 5.15
+explosiveness = 1.0
+randomness = 0.6
+mesh = SubResource("CapsuleMesh_w6qog")
+emission_shape = 2
+emission_sphere_radius = 1.0
+emission_colors = PackedColorArray(0.6255971, 0.6255971, 0.6255971, 1, 1, 1, 1, 1, 0.29954746, 0.29954746, 0.29954743, 1)
+gravity = Vector3(0, 0, 0)
+linear_accel_min = -1.25
+linear_accel_max = -0.5
+radial_accel_min = 0.8
+radial_accel_max = 1.6
+scale_amount_min = 0.4
+scale_amount_max = 2.6
+scale_amount_curve = SubResource("Curve_yja8e")
