@@ -135,6 +135,7 @@ func loadingData():
 			printerr("Something is wrong with data: " + str(data))
 			
 func deleteSaveData():
+	#Removes all .json save files and sets the stats to default values
 	DirAccess.open("user://").remove("SaveData.json")
 	DirAccess.open("user://").remove("FoodItems.json")
 	DirAccess.open("user://").remove("Ducks.json")
@@ -155,6 +156,7 @@ func deleteSaveData():
 	timeLeftRanch = 0
 
 func _process(delta: float) -> void:
+	#If on title screen don't update time
 	if self.get_parent().get_children().size() == 2 && self.get_parent().get_child(1).name != "Starting Screen":
 		igt += delta
 	
@@ -168,9 +170,11 @@ func _process(delta: float) -> void:
 		savingData()
 		autoSaveTime -= 100
 	
+	#Loops Music
 	if self.get_child(0).is_playing() == false:
 		self.get_child(0).play()
 	
+	#Changes music depending on what scene you are in
 	if self.get_parent().get_children().size() == 2 && self.get_parent().get_child(1).name == "Mines":
 		if musicSwitch == "" || musicSwitch != "mines":
 			self.get_child(0).stream = load("res://Sounds/Caves.mp3")
