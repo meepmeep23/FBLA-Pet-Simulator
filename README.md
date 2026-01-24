@@ -2,6 +2,7 @@ Description:
 This is a game made for FBLA Introduction to Programming 2025-2026. If you want to play the game go to releases and download the newest version for your device. To edit this game, you need to download https://godotengine.org. Download the source code by cloning this repository, or downloading the source code through github. Open the app and press scan. Select the downloaded source code. If source code is still a .zip, you must extract the zip before scanning. If you have done everything correctly, you can now edit the game to your heart's content! 
 
 Assets used:
+
 https://godotshaders.com/shader/water-shader-3d-godot-4-3/
 by @LesusX on YouTube, licensed under CC0 license
 
