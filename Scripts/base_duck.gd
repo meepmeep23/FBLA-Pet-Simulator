@@ -299,6 +299,7 @@ func foodBehavior(delta):
 			food -= metabolismSpeed * delta
 		food -= metabolismSpeed * delta
 		nutrition = ((foodQuality + food / 100) * 5)
+	#When Duck is an egg, its food must be 100
 	elif age < 1:
 		food = 100
 		nutrition = 10
@@ -318,6 +319,8 @@ func fed(foodType: String):
 		saveDataValues.foodItems.set(foodType, saveDataValues.foodItems.get(foodType) - 1)
 		$"Quack Sound".stop()
 		$"Quack Sound".play()
+		
+		#Check if food inputted in the function is one of these foods and change the stats based on what food it is
 		if foodType == "Bread":
 			food += 20
 			saturation -= 0.005
@@ -346,14 +349,9 @@ func fed(foodType: String):
 			addedDiseasePrevention += (1 - (baseHealthiness + addedDiseasePrevention)) / 4
 			if healthCondition == "Mild Cold":
 				healthCondition = ""
-			
-			if sadSense > angerSense:
-				sad -= 5
-			else:
-				anger -= 5
-			
 			return
 		
+		#Add food to end of foodList and remove the first one if there is more than 5 in the list after adding food
 		foodList.append(foodType)
 		if foodList.size() > 5:
 			foodList.remove_at(0)
@@ -362,6 +360,11 @@ func fed(foodType: String):
 		var foodUsed = false
 		var tempFoodQuality = 1
 		
+		"""
+		Loop through foodList to check if the duck has been fed the same food as one of the last 5 foods it ate,
+		and if so it will lower the temporary food quality. After looping through the entire list,
+		make temporary food quality the set variable for temporary food quality
+		"""
 		for f in foodList:
 			if f == "Bread":
 				tempFoodQuality -= 0.05
@@ -388,14 +391,19 @@ func fed(foodType: String):
 
 #Health Values and getting sick/hurt
 func healthSetUp(delta):
+	#Average Nutrition and Ducks Healthiness to get overall health
 	overallHealth = (nutrition + (baseHealthiness + addedDiseasePrevention) * 10) / 2
 	sickOdds = 200 * (0.5 ** overallHealth)
+	#If not in tutorial && time is greater than the time duck's health should be updated
 	if saveDataValues.igt > timeToCheckDuck && get_parent().get_parent().find_child("UI Main").firstTime == false:
+		#If healthCondition is not maxed out and isn't something random
 		if healthCondition == "" || healthCondition == "Scratched Up" || healthCondition == "Mild Cold":
 			sicknessCheckTime = randf_range(10,40)
 			timeToCheckDuck = saveDataValues.igt + sicknessCheckTime
 			if saveDataValues.spentDictionary.get("Hospital Bill") == null:
 				saveDataValues.spentDictionary.set("Hospital Bill", 0)
+			
+			#If unlucky and duck got sick, give duck sickness relative to what its healthiness is
 			if rand.randf() * 100 < sickOdds:
 				print("Something Happened...")
 				if wasInMine == false:
@@ -431,11 +439,12 @@ func healthSetUp(delta):
 						
 					if overallHealth > 8:
 						healthCondition = "Mild Cold"
-			else:
-				healthCondition = ""
+	
+	#Change stats based on what the duck's health condition is
 	if healthCondition == "":
 		tempHue = hue
 		tempSaturation = tempSaturation
+	
 	if healthCondition == "Mild Cold":
 		tempHue = move_toward(tempHue, 0.34, delta / 100)
 		tempSaturation = move_toward(tempSaturation, 1, delta / 100)
@@ -486,7 +495,7 @@ func healthSetUp(delta):
 		else:
 			anger += delta * (1 + angerSense)
 
-#Behaviors / statChanges that are caused by emotions
+#Visual changes that are caused by emotions
 func emotionBehavior():
 	if anger > 10:
 		find_child("Ducky Meshes").find_child("Right Eye").mesh = angerEyes
@@ -533,6 +542,7 @@ func selectionBehavior():
 		$"3D Selection Gui".visible = false
 		self.get_child(0).get_child(1).material_override.albedo_color = Color(0,0,0,255)
 
+#If duck's raycasts are colliding, change the state to think
 func movementCheck():
 	var raycast = self.find_child("Raycasts")
 	
@@ -550,7 +560,6 @@ func move(delta):
 		if i >= 2.5:
 			i = 0
 			state = "think"
-			
 		
 		velocity.x = direction.x * speed
 		velocity.z = direction.y * speed
