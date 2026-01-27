@@ -42,9 +42,10 @@ func _on_breed_button_pressed() -> void:
 		var femaleGenetics = saveDataValues.Duckies.get(female)
 		var babyGenetics = {}
 		var babyNameIsAnotherName = false
-		
+
+		#Error checking
 		for c in $Ui/LineEdit.text:
-			for v in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']:
+			for v in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
 				if c == v:
 					$Ui/LineEdit.add_theme_color_override("font_placeholder_color", Color(1,0,0))
 					$Ui/LineEdit.text = ""
@@ -86,16 +87,21 @@ func _on_breed_button_pressed() -> void:
 			return
 		
 		print("pass 5")
-		
+
+		#If passes all the checks check again ig, I probably should've removed this
 		if maleGenetics != null && femaleGenetics != null && $Ui/LineEdit.text != null && $Ui/LineEdit.text != "" && babyNameIsAnotherName == false && saveDataValues.money >= 500:
+
+			#Loops through all of the male's stats to give stats to the baby
 			for x in maleGenetics:
+				#If the stat is a boolean generate a random boolean
 				if maleGenetics.get(x) is bool:
 					var r = randi_range(0,1)
 					if r == 1:
 						babyGenetics.set(x, true)
 					if r == 0:
 						babyGenetics.set(x, false)
-						
+
+				#If the stat is a float, generate a random float in betweeen the adult's numbers unless it is one of the hues because the in between number is different
 				if maleGenetics.get(x) is float:
 					if x == "hue" || x == "beakHue":
 						var difference = maleGenetics.get(x) - femaleGenetics.get(x)
@@ -115,7 +121,8 @@ func _on_breed_button_pressed() -> void:
 							babyGenetics.set(x, randf_range(femaleGenetics.get(x), maleGenetics.get(x)))
 						else:
 							babyGenetics.set(x, randf_range(maleGenetics.get(x), femaleGenetics.get(x)))
-				
+
+				#If the stat is an integer, generate an integer in between the parent's stats
 				if maleGenetics.get(x) is int:
 					if maleGenetics.get(x) > femaleGenetics.get(x):
 						babyGenetics.set(x, randi_range(femaleGenetics.get(x), maleGenetics.get(x)))
@@ -126,7 +133,7 @@ func _on_breed_button_pressed() -> void:
 			if saveDataValues.hospitalValues.get(male) != null || saveDataValues.hospitalValues.get(female):
 				babyGenetics.set("baseHealthiness", move_toward(babyGenetics.get("baseHealthiness"), 0, 0.1))
 			
-			#Set variables of the baby that shouldn't be mixed
+			#Set variables of the baby that shouldn't be randomly generated
 
 			babyGenetics.set("age", 0)
 			babyGenetics.set("strength", 1)
@@ -137,9 +144,12 @@ func _on_breed_button_pressed() -> void:
 			babyGenetics.set("foodQuality", 1)
 			
 			saveDataValues.Duckies.set($Ui/LineEdit.text, babyGenetics)
-			
+
+
+			#Subtract money by $500
 			saveDataValues.money -= 500
-			
+
+			#Set the spendDictionary value to be 500 less
 			if saveDataValues.spentDictionary.get("Baby Breeding Cost") != null:
 				saveDataValues.spentDictionary.set("Baby Breeding Cost", saveDataValues.spentDictionary.get("Baby Breeding Cost") - 500)
 			else:
@@ -148,7 +158,8 @@ func _on_breed_button_pressed() -> void:
 			$Ui/Money.text = "$" + str(saveDataValues.money)
 			
 			Duckies = saveDataValues.Duckies
-			
+
+			#Setup a new "falseDuck" to represent the baby in the nursery
 			var ducky = falseDuck.instantiate()
 			ducky.name = $Ui/LineEdit.text
 			ducky.position.x = randf_range(-5,5)
