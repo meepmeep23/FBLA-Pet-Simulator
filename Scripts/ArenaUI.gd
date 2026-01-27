@@ -2,6 +2,7 @@ extends TabContainer
 
 @export var maxTabs = 1
 
+#6 Colors are used to generate the 6 random colors needed for the starting duck options
 var colorOption1: Color
 var colorOption2: Color
 var colorOption3: Color
@@ -253,7 +254,7 @@ func changeTheDucksColorsToNewColors():
 	self.get_parent().find_child("Ducks").get_child(1).wingColor = Color.from_hsv(femaleBodyColor.h,femaleBodyColor.s,femaleBodyColor.v - 0.2)
 	self.get_parent().find_child("Ducks").get_child(1).refreshDuckColors()
 
-#Shows mobile UI, currently empty
+#Shows mobile UI, currently not implemented
 func mobileUI():
 	if OS.get_name() == "Android" || "IOS":
 		$"Ranch/Mobile Controls".position.x = -1920
