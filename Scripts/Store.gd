@@ -1,5 +1,6 @@
 extends Control
 
+#Defines the sell price of the minerals 
 var mineralDictionaryPrice = {
 	Iron = 20,
 	Coal = 10,
@@ -44,6 +45,7 @@ func _on_buy_list_item_clicked(index: int, _at_position: Vector2, mouse_button_i
 	$Money.text = "$" + str(saveDataValues.money).pad_decimals(0)
 
 func setUpSellTab():
+	#Clears the sell tab and sets up the displayed values of everything
 	$StoreTab/Sell/SellList.clear()
 	for m in saveDataValues.miningValues:
 		print(m)
@@ -58,6 +60,7 @@ func _on_store_tab_tab_selected(tab: int) -> void:
 
 
 func _on_sell_list_item_clicked(index: int, _at_position: Vector2, _mouse_button_index: int) -> void:
+	#empties the text to get the text without any excess and adds the money, adds to the spentDictionary, and removes the mineral from miningValues
 	var mineral = $StoreTab/Sell/SellList.get_item_text(index).remove_chars(" :.1234567890$x")
 	print(mineral + " sold.")
 	saveDataValues.miningValues.set(mineral, saveDataValues.miningValues.get(mineral) - 1)
@@ -72,6 +75,7 @@ func _on_sell_list_item_clicked(index: int, _at_position: Vector2, _mouse_button
 
 
 func _on_sell_all_pressed() -> void:
+	#Loops through all miningValues and as long as it isn't one of the non-mineral values, removes the mineral, and adds the price * amount for every mineral
 	for m in saveDataValues.miningValues:
 		if m == "MiningTime":
 			pass
