@@ -13,6 +13,8 @@ var d: float
 var b: float
 var a: float
 
+#Delete this script because the feature has been removed
+
 func _process(delta: float) -> void:
 	#Uses Cramer's rule to calculate the quadratic equation for the arc of the projectile
 	#Moves the projectile towards the target depending on the time its been alive
