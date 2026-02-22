@@ -4,10 +4,12 @@ var Duckies = saveDataValues.Duckies
 var hasCheckedDucks = false
 @onready var baseDuck = preload("res://Objects/base_duck.tscn")
 
-func _process(_delta: float) -> void:
-	#System for loading ducks from saved data by looping through the dictionary and spawning ducks
+func _ready():
 	saveDataValues.testArena = self
 	Duckies = saveDataValues.Duckies
+
+func _process(_delta: float) -> void:
+	#System for loading ducks from saved data by looping through the dictionary and spawning ducks
 	if hasCheckedDucks == false && Duckies != {}:
 		get_child(0).get_child(1).queue_free()
 		get_child(0).get_child(0).queue_free()

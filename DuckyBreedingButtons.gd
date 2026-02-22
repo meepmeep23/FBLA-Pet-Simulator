@@ -7,22 +7,18 @@ var selected = false
 func _ready() -> void:
 	#Removes the test item, and sets up the duck list depending on gender.
 	remove_item(0)
-	for x in saveDataValues.Duckies:
-		print(x)
-		print(saveDataValues.Duckies.get(x).get("female"))
-		if saveDataValues.Duckies.get(x).get("female") == true:
-			if female == true && saveDataValues.Duckies.get(x).get("age") >= 6:
-				add_item(x)
-		if saveDataValues.Duckies.get(x).get("female") == false:
-			if female == false && saveDataValues.Duckies.get(x).get("age") >= 6:
-				add_item(x)
-
-func _process(_delta: float) -> void:
-	#I really have no idea what this does because pressing 'E' was never used for it, but removing it break something. ¯\_(ツ)_/¯
-	if has_focus() == true && Input.is_action_just_pressed("E"):
-		for x in self.get_parent().get_child_count():
-			get_child(x).selected = false
-		selected = true
+	for d in saveDataValues.Duckies:
+		if saveDataValues.Duckies.get(d).get("female") == true:
+			if female == true && saveDataValues.Duckies.get(d).get("age") >= 7:
+				if d != saveDataValues.miningValues.get("selectedDuck") || saveDataValues.igt - saveDataValues.miningValues.get("duckMiningStartTime") >= 100: 
+					if saveDataValues.hospitalValues.get(d) == null || saveDataValues.hospitalValues.get(d).get("inHospital") == false:
+						add_item(d)
+		
+		if saveDataValues.Duckies.get(d).get("female") == false:
+			if female == false && saveDataValues.Duckies.get(d).get("age") >= 7:
+				if d != saveDataValues.miningValues.get("selectedDuck") || saveDataValues.igt - saveDataValues.miningValues.get("duckMiningStartTime") >= 100: 
+					if saveDataValues.hospitalValues.get(d) == null || saveDataValues.hospitalValues.get(d).get("inHospital") == false:
+						add_item(d)
 
 func _on_item_selected(index: int) -> void:
 	#Reads selection

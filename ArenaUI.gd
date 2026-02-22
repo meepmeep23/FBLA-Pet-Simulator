@@ -1,7 +1,5 @@
 extends TabContainer
 
-var openTab = 0
-
 @export var maxTabs = 1
 
 var colorOption1: Color
@@ -30,12 +28,10 @@ var hasReadIntroduction = false
 
 """
 This Script is primarily used for the starting tutorial.
-Also includes making the mobile UI, which doesn't have anything yet, visible. 
 """
 
 
 func _process(_delta: float) -> void:
-	mobileUI()
 	#Generates color options for the two starting ducks
 	if hasGeneratedColors == false:
 		colorOption1 = Color.from_hsv(randf(),randf(),randf())
@@ -59,24 +55,19 @@ func _process(_delta: float) -> void:
 		
 		hasGeneratedColors = true
 	
-	if openTab == 0:
+	if current_tab == 0:
 		position.x = 1920
 		if Input.is_action_just_pressed("escape"):
-			openTab = 5
+			current_tab = 5
 			position.x = 0
 	else:
 		position.x = 0
 	
-	#Used for issues with setting current tab directly
-	current_tab = openTab
-	
 	#If it is the player's first time, start tutorial, otherwise, allow tabs to switch with 'Tab'.
 	if firstTime == false:
-		if Input.is_action_just_pressed("escape") && openTab == 1:
-			openTab = 0
-		
-		if Input.is_action_just_pressed("click"):
-			$Store/Money.text = "$" + str(saveDataValues.money)
+		if Input.is_action_just_pressed("escape") && current_tab == 1:
+			current_tab = 0
+	
 	else:
 		if hasReadIntroduction == true:
 			if maleChoice == true:
@@ -84,7 +75,7 @@ func _process(_delta: float) -> void:
 			else:
 				$"First Duck Selection/RichTextLabel".text = "Choose Your Female Starter Duck!"
 		else:
-			openTab = 3
+			current_tab = 3
 			
 
 func _on_option_1_pressed() -> void:
@@ -107,7 +98,7 @@ func _on_option_1_pressed() -> void:
 		
 		changeTheDucksColorsToNewColors()
 		saveDataValues.savingData()
-		openTab = 4
+		current_tab = 4
 
 func _on_option_2_pressed() -> void:
 	"""
@@ -129,7 +120,7 @@ func _on_option_2_pressed() -> void:
 		
 		changeTheDucksColorsToNewColors()
 		saveDataValues.savingData()
-		openTab = 4
+		current_tab = 4
 
 func _on_option_3_pressed() -> void:
 	"""
@@ -151,11 +142,11 @@ func _on_option_3_pressed() -> void:
 		
 		changeTheDucksColorsToNewColors()
 		saveDataValues.savingData()
-		openTab = 4
+		current_tab = 4
 
 func _on_continue_pressed() -> void:
 	#Continue to the Duck selection tab, could probably be merged into a different function
-	openTab = 2
+	current_tab = 2
 	hasReadIntroduction = true
 
 func _on_line_edit_text_submitted(new_text: String) -> void:
@@ -166,13 +157,30 @@ func _on_line_edit_text_submitted(new_text: String) -> void:
 	*If the text is empty or already taken, it will show an error and clear the text.
 	"""
 	#Error with numbers.
-	for c in $"Naming Your New Ducks!/LineEdit".text:
-			for v in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']:
-				if c == v:
-					$"Naming Your New Ducks!/LineEdit".text = ""
-					$"Naming Your New Ducks!/LineEdit".add_theme_color_override("font_placeholder_color", Color(1,0,0))
-					$"Naming Your New Ducks!/LineEdit".placeholder_text = "Error: There must not be numbers in name."
-					return
+	for c in new_text:
+		for v in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']:
+			if c == v:
+				$"Naming Your New Ducks!/LineEdit".text = ""
+				$"Naming Your New Ducks!/LineEdit".add_theme_color_override("font_placeholder_color", Color(1,0,0))
+				$"Naming Your New Ducks!/LineEdit".placeholder_text = "Error: There must not be numbers in name."
+				return
+	
+	if new_text == "":
+		$"Naming Your New Ducks!/LineEdit".placeholder_text = "Error: Name can't be empty."
+		$"Naming Your New Ducks!/LineEdit".text = ""
+		$"Naming Your New Ducks!/LineEdit".add_theme_color_override("font_placeholder_color", Color(1,0,0))
+
+	if new_text == "XyzAbc":
+		$"Naming Your New Ducks!/LineEdit".placeholder_text = "Error: You shouldn't pick this name."
+		$"Naming Your New Ducks!/LineEdit".text = ""
+		$"Naming Your New Ducks!/LineEdit".add_theme_color_override("font_placeholder_color", Color(1,0,0))
+	
+	if new_text == maleName:
+		$"Naming Your New Ducks!/LineEdit".placeholder_text = "Error: no duplicate names."
+		$"Naming Your New Ducks!/LineEdit".text = ""
+		$"Naming Your New Ducks!/LineEdit".add_theme_color_override("font_placeholder_color", Color(1,0,0))
+		
+	
 	#This is a special case to make sure that the name isn't "XyzAbc" which is the default name of the starting ducks.
 	if new_text != "" && new_text != "XyzAbc"  && new_text != maleName:
 		$"Naming Your New Ducks!/LineEdit".add_theme_color_override("font_placeholder_color", Color(1,1,1))
@@ -207,20 +215,8 @@ func _on_line_edit_text_submitted(new_text: String) -> void:
 			self.get_parent().find_child("Ducks").get_child(1).find_child("CollisionShape3D").disabled = false
 			
 			saveDataValues.savingData()
-			openTab = 0
+			current_tab = 0
 			firstTime = false
-	
-	#Error management.
-	else:
-		if new_text == "":
-			$"Naming Your New Ducks!/LineEdit".placeholder_text = "Error: Name can't be empty."
-		if new_text == "XyzAbc":
-			$"Naming Your New Ducks!/LineEdit".placeholder_text = "Error: You shouldn't pick this name."
-		if new_text == maleName:
-			$"Naming Your New Ducks!/LineEdit".placeholder_text = "Error: no duplicate names."
-			
-		$"Naming Your New Ducks!/LineEdit".text = ""
-		$"Naming Your New Ducks!/LineEdit".add_theme_color_override("font_placeholder_color", Color(1,0,0))
 
 func changeTheDucksColorsToNewColors():
 	#Change the starting ducks colors to be the colors that were picked.
@@ -248,18 +244,14 @@ func changeTheDucksColorsToNewColors():
 	self.get_parent().find_child("Ducks").get_child(1).wingColor = Color.from_hsv(femaleBodyColor.h,femaleBodyColor.s,femaleBodyColor.v - 0.2)
 	self.get_parent().find_child("Ducks").get_child(1).refreshDuckColors()
 
-#Shows mobile UI, currently empty
-func mobileUI():
-	if OS.get_name() == "Android" || "IOS":
-		$"Ranch/Mobile Controls".position.x = -1920
-
 #Makes the game think the colors aren't generated yet so it just redoes it
 func _on_reroll_pressed() -> void:
 	hasGeneratedColors = false
 
 func _on_store_exit_pressed() -> void:
-	if openTab == 1:
-		openTab = 0
+	if current_tab == 1:
+		current_tab = 0
+		$Store/StoreTab.current_tab = 0
 
 func _on_f_button_pressed() -> void:
 	Input.action_press("F")

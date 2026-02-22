@@ -18,7 +18,7 @@ func _process(_delta: float) -> void:
 	#*Also has 3D Gui that behaves the same way as the duck gui
 	
 	#Stops the building from being selected while in store
-	if self.get_parent().find_child("UI Main").openTab == 1:
+	if self.get_parent().find_child("UI Main").current_tab == 1:
 		selected = false
 	
 	if Input.is_action_just_pressed("click") && mouseInside == true:
@@ -27,10 +27,11 @@ func _process(_delta: float) -> void:
 		selected = false
 	if selected == true:
 		shadowMaterial.set_albedo(Color(1.0, 1.0, 1.0, 1.0))
-		if Input.is_action_just_pressed("E"):
+		if Input.is_action_just_pressed("Enter Building"):
 			print("loading " + sceneToLoad)
 			saveDataValues.savingData()
 			saveDataValues.testArena = null
+			saveDataValues.timeLeftRanch = saveDataValues.igt
 			get_tree().change_scene_to_file(sceneToLoad)
 			
 		$Sprite3D.visible = true

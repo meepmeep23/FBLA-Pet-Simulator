@@ -25,16 +25,10 @@ var hasPolished = false
 var female = false
 
 var strengthPotential: float
-var intelligencePotential: float
-var flyingPotential: float
-var diseaseChance: float
-var stamina: float
+var baseHealthiness: float
 var speed: float
-var attackSpeed: float
 var metabolismSpeed: float
 var luck: float
-var lifeLength: float
-var wisdom: float
 
 #Cosmetic
 var bodyColor: Color
@@ -45,10 +39,6 @@ var hue: float
 var saturation: float
 var value: float
 
-var eyeHue: float
-var eyeValue: float
-
-var wingLength: float
 var beakHue: float
 var beakSaturation: float
 var beakValue: float
@@ -64,23 +54,30 @@ var bored: float
 
 #Non-Genetic Values
 
-var cost = 0
 var age = 0.0
-var holiness: float
-var intelligence: float
 var strength: float
-var flyingHeight: float
-var health: float
-var healthCondition: int
-var tiredness: float
-var lifeLengthPerm: float
 var overallSize: float
 var food = 100
 
 var size = 1
-var timesMined = 0
+var timesMined: int
 
-var hasBeenBaby = false #Used for playing the animation right when the baby grows up
+var wasChild = false #Used for making duck spawn in when done
+var wasInMine = false
+
+var foodList = []
+var foodQuality = 1.0
+var timeWOFood = 0 #Used for visualizing the time, instead of subtracting from nutrition
+var nutrition = 1
+
+var sickOdds = 0.0
+var overallHealth = 10.0
+var addedDiseasePrevention = 0.0
+var numOfVacBought = 0 #Number of Vaccines Bought
+var healthCondition = ""
+
+var timeToCheckDuck = 0
+var sicknessCheckTime = 20
 
 """
 Whenever you want to add a new value to the save data, you need to follow these steps:
@@ -170,12 +167,20 @@ func _physics_process(delta: float) -> void:
 	
 #This Function Also has move(), think(), and turn() inside.
 func ageBehavior(delta):
-	age += delta * 0.01
+	if age > 7:
+		if wasChild == false:
+			self.visible = false
+			velocity.x = 0
+			velocity.z = 0
+			$CollisionShape3D.disabled = true
+		
+	
+	age += delta * 0.05
 	
 	$"3D Gui/SubViewport/Ui Parent/Age".text = str(age).pad_decimals(2)
 	
 	if age < 1:
-		hasBeenBaby = true
+		wasChild = true
 		self.find_child("Egg Meshes").visible = true
 		size = 0.3
 		velocity.x = 0
@@ -183,8 +188,8 @@ func ageBehavior(delta):
 	
 	#Makes babies smaller when they are younger
 	if age <= 7:
-		if age >= 1 && $AnimationPlayer.is_playing() == false:
-			if hasBeenBaby == false:
+		if age >= 1:
+			if wasChild == false:
 				self.find_child("Egg Meshes").visible = false
 				size = ((age + 3) / 10) * overallSize
 				move(delta)
@@ -192,11 +197,8 @@ func ageBehavior(delta):
 				turn(delta)
 			else:
 				$AnimationPlayer.play("Egg Hatch")
-				hasBeenBaby = false
+				wasChild = false
 		food = 100
-	else:
-		self.visible = false
-		self.get_child(1).disabled = true
 
 func movementCheck():
 	var raycast = self.find_child("Raycasts")
@@ -204,7 +206,6 @@ func movementCheck():
 	for r in raycast.get_children():
 		if r.is_colliding() == true:
 			state = "think"
-			print("GRRRR")
 
 func move(delta):
 	#Moves the duck in the direction for 2.5 seconds
@@ -269,8 +270,6 @@ func defineSelfDictionary():
 	selfDictionary.set("beakHue", beakHue)
 	selfDictionary.set("beakSaturation", beakSaturation)
 	selfDictionary.set("beakValue", beakValue)
-	selfDictionary.set("eyeHue", eyeHue)
-	selfDictionary.set("eyeValue", eyeValue)
 	selfDictionary.set("speed", speed)
 	selfDictionary.set("overallSize", overallSize)
 	selfDictionary.set("food", food)
@@ -280,30 +279,10 @@ func defineSelfDictionary():
 	selfDictionary.set("timesMined", timesMined)
 	selfDictionary.set("strengthPotential", strengthPotential)
 	selfDictionary.set("strength", strength)
-
-func refreshDuckColors():
-	"""
-	Changes the duck's color to the duck's current colors
-	"""
-	var meshes = self.get_child(0)
 	
-	mat = mat.duplicate()
-	mat.set_albedo(bodyColor)
-	
-	meshes.get_child(0).material_override = mat.duplicate()
-	meshes.get_child(7).material_override = mat.duplicate()
-	
-	mat = mat.duplicate()
-	mat.set_albedo(wingColor)
-	
-	meshes.get_child(2).material_override = mat.duplicate()
-	meshes.get_child(3).material_override = mat.duplicate()
-	
-	mat = mat.duplicate()
-	mat.set_albedo(beakColor)
-	
-	meshes.get_child(4).material_override = mat.duplicate()
-
-func renameDuck(newName: String):
-	saveDataValues.Duckies.erase(self.name)
-	self.name = newName
+	selfDictionary.set("foodList", foodList)
+	selfDictionary.set("foodQuality", foodQuality)
+	selfDictionary.set("metabolismSpeed", metabolismSpeed)
+	selfDictionary.set("baseHealthiness", baseHealthiness)
+	selfDictionary.set("foodQuality", foodQuality)
+	selfDictionary.set("addedDiseasePrevention", addedDiseasePrevention)

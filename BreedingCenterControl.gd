@@ -46,13 +46,37 @@ func _on_breed_button_pressed() -> void:
 		for c in $Ui/LineEdit.text:
 			for v in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']:
 				if c == v:
+					$Ui/LineEdit.add_theme_color_override("font_placeholder_color", Color(1,0,0))
 					$Ui/LineEdit.text = ""
 					$Ui/LineEdit.placeholder_text = "Error: There must not be numbers in name."
 					return
 		
+		print("pass 1")
+		
 		for n in saveDataValues.Duckies:
 			if n == $Ui/LineEdit.text:
-				babyNameIsAnotherName = true
+				$Ui/LineEdit.add_theme_color_override("font_placeholder_color", Color(1,0,0))
+				$Ui/LineEdit.text = ""
+				$Ui/LineEdit.placeholder_text = "Error: Baby must have a unique name."
+				return
+		
+		print("pass 2")
+		
+		if $Ui/LineEdit.text == "":
+			$Ui/LineEdit.add_theme_color_override("font_placeholder_color", Color(1,0,0))
+			$Ui/LineEdit.placeholder_text = "Error: There is no name for the baby."
+			$Ui/LineEdit.text = ""
+			return
+		
+		print("pass 3")
+		
+		if saveDataValues.money < 500:
+			$Ui/LineEdit.add_theme_color_override("font_placeholder_color", Color(1,0,0))
+			$Ui/LineEdit.placeholder_text = "Error: You may or may not be broke..."
+			$Ui/LineEdit.text = ""
+			return
+		
+		print("pass 4")
 		
 		if maleGenetics != null && femaleGenetics != null && $Ui/LineEdit.text != null && $Ui/LineEdit.text != "" && babyNameIsAnotherName == false && saveDataValues.money >= 500:
 			for x in maleGenetics:
@@ -88,20 +112,20 @@ func _on_breed_button_pressed() -> void:
 						babyGenetics.set(x, randi_range(femaleGenetics.get(x), maleGenetics.get(x)))
 					else:
 						babyGenetics.set(x, randi_range(maleGenetics.get(x), femaleGenetics.get(x)))
-				
+			
+			#Sick parents will make sick babies
+			if saveDataValues.hospitalValues.get(male) != null || saveDataValues.hospitalValues.get(female):
+				babyGenetics.set("baseHealthiness", move_toward(babyGenetics.get("baseHealthiness"), 0, 0.1))
+			
 			#Set variables of the baby that shouldn't be mixed
 
 			babyGenetics.set("age", 0)
-			babyGenetics.set("cost", 0)
-			babyGenetics.set("holiness", 0)
-			babyGenetics.set("intelligence", 1)
 			babyGenetics.set("strength", 1)
-			babyGenetics.set("flyingHeight", 1)
 			babyGenetics.set("health", 10)
 			babyGenetics.set("tiredness", 10)
-			babyGenetics.set("lifeLength", 20)
 			babyGenetics.set("overallSize", 1)
 			babyGenetics.set("food", 100)
+			babyGenetics.set("foodQuality", 1)
 			
 			saveDataValues.Duckies.set($Ui/LineEdit.text, babyGenetics)
 			
@@ -112,7 +136,7 @@ func _on_breed_button_pressed() -> void:
 			else:
 				saveDataValues.spentDictionary.set("Baby Breeding Cost", -500)
 			
-			$Ui/Money.text = "$" + str(saveDataValues.money)
+			$Ui/Money.text = "$" + str(saveDataValues.money).pad_decimals(0)
 			
 			Duckies = saveDataValues.Duckies
 			
@@ -122,19 +146,12 @@ func _on_breed_button_pressed() -> void:
 			ducky.position.z = randf_range(-5,5)
 			ducky = ducky.duplicate()
 			get_child(0).add_child(ducky,true)
+			$Ui/LineEdit.placeholder_text = "Name Your Baby Here"
+			$Ui/LineEdit.add_theme_color_override("font_placeholder_color", Color(0.58, 0.58, 0.58, 1.0))
 			
 			#Delete Text So There Aren't Any "Accidents"
 			$Ui/LineEdit.text = ""
 		
-		else:
-			#Errors with names / money.
-			$Ui/LineEdit.text = ""
-			if $Ui/LineEdit.text == null:
-				$Ui/LineEdit.placeholder_text = "Error: There is no name for the baby."
-			if babyNameIsAnotherName == true:
-				$Ui/LineEdit.placeholder_text = "Error: Baby must have a unique name."
-			if saveDataValues.money < 500:
-				$Ui/LineEdit.placeholder_text = "Error: You may or may not be broke..."
 	else:
 		#Error with male / female not being selected
 		$Ui/LineEdit.text = ""

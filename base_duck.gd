@@ -5,6 +5,10 @@ extends CharacterBody3D
 var mat = preload("res://Materials/mat.tres")
 var shadowMat = preload("res://Materials/shadowMat.tres")
 
+var angerEyes = preload("res://Models & Textures/angryEye.tres")
+var baseEyes = preload("res://Models & Textures/eye.tres")
+var sadEyes = preload("res://Models & Textures/sadEye.tres")
+
 var rand = RandomNumberGenerator.new()
 var i = 0
 var direction: Vector2
@@ -25,16 +29,10 @@ var hasPolished = false
 var female = false
 
 var strengthPotential: float
-var intelligencePotential: float
-var flyingPotential: float
-var diseaseChance: float
-var stamina: float
+var baseHealthiness: float
 var speed: float
-var attackSpeed: float
 var metabolismSpeed: float
 var luck: float
-var lifeLength: float
-var wisdom: float
 
 #Cosmetic
 var bodyColor: Color
@@ -42,38 +40,26 @@ var wingColor: Color
 var beakColor: Color
 
 var hue: float
+var tempHue: float
 var saturation: float
+var tempSaturation: float
 var value: float
 
-var eyeHue: float
-var eyeValue: float
-
-var wingLength: float
 var beakHue: float
 var beakSaturation: float
 var beakValue: float
 
 #Emotions
-var angerSens: float
+var angerSense: float
 var sadSense: float
-var boredSense: float
 
 var anger: float
 var sad: float
-var bored: float
 
 #Non-Genetic Values
 
-var cost = 0
 var age = 0.0
-var holiness: float
-var intelligence: float
 var strength: float
-var flyingHeight: float
-var health: float
-var healthCondition: int
-var tiredness: float
-var lifeLengthPerm: float
 var overallSize: float
 var food = 100
 
@@ -82,22 +68,29 @@ var timesMined: int
 
 var wasChild = false #Used for making duck spawn in when done
 var wasInMine = false #Used for making duck spawn when exiting mine
+var wasInHospital = false #Used for making duck spawn when exiting hospital
 
 var foodList = []
 var foodQuality = 1.0
-var timeWOFood = 0
+var timeWOFood = 0 #Used for visualizing the time, instead of subtracting from nutrition
 var nutrition = 1
+
+var sickOdds = 0.0
+var overallHealth = 10.0
+var addedDiseasePrevention = 0.0
+var numOfVacBought = 0 #Number of Vaccines Bought
+var healthCondition = ""
+
+var timeToCheckDuck = 0
+var sicknessCheckTime = 20
 
 """
 Whenever you want to add a new value to the save data, you need to follow these steps:
 	*Set up the variable
 	*Put the variable down in the defineSelfDictionary function
-	*Make the two situations for what happens with the variable in the getDuckyPolished function:
-		*If there is no save data, what should the variable be?
-		*If there is save data, get it and save it to the variable
+	*If there is no save data, what should the variable be?
 	*Lastly add all the functionality you need for the variable
 """
-
 
 func _ready() -> void:
 	#Debugging checks to solve errors and to check if duck isn't here. 
@@ -106,6 +99,9 @@ func _ready() -> void:
 	connect("mouse_exited", _on_mouse_exited)
 	print("connected2")
 	self.find_child("3D Selection Gui").texture = self.find_child("SubViewport").get_texture()
+	food = 100
+	sicknessCheckTime = randf_range(10,40)
+	timeToCheckDuck = saveDataValues.igt + sicknessCheckTime
 
 #Uses for polishing the ducks values on loading.
 func getDuckyPolished():
@@ -129,30 +125,28 @@ func getDuckyPolished():
 			female = true
 		
 		strengthPotential = randf() + 0.1
-		intelligencePotential = randf() + 0.1
-		flyingPotential = randf() + 0.1
-		diseaseChance = randf()
-		stamina = randf() * 100
+		baseHealthiness = randf()
 		speed = randf_range(0.33,3)
-		attackSpeed = randf_range(0.33,3)
-		metabolismSpeed = randf() + 0.1
+		metabolismSpeed = (strengthPotential + speed) / 2
 		luck = randf_range(0,7)
-		lifeLength = randf_range(0.7,1.2)
-		wisdom = randf() + 1
 		
 		hue = randf()
+		tempHue = hue
 		saturation = randf()
 		value = randf()
 		beakHue = randf()
 		beakSaturation = randf()
 		beakValue = randf()
 		
+		angerSense = randf()
+		sadSense = randf()
+		
 		age = 0.8
 		overallSize = 1
 		
 		anger = 0
 		sad = 0
-		bored = 0
+		foodQuality = 0.5
 		
 		timesMined = 0
 	
@@ -162,7 +156,7 @@ func getDuckyPolished():
 	
 	#Fixing Materials, can't use the function because of the way genetics are loaded by 3 values and not 1 color.
 	var meshes = self.get_child(0)
-	bodyColor = Color.from_hsv(hue, saturation, value, 255)
+	bodyColor = Color.from_hsv(tempHue, tempSaturation, value, 255)
 	
 	mat = mat.duplicate()
 	mat.set_albedo(bodyColor)
@@ -171,7 +165,7 @@ func getDuckyPolished():
 	meshes.get_child(7).material_override = mat.duplicate()
 	
 	
-	wingColor = Color.from_hsv(hue, saturation, value - 0.2, 255)
+	wingColor = Color.from_hsv(tempHue, tempSaturation, value - 0.2, 255)
 	
 	mat = mat.duplicate()
 	mat.set_albedo(wingColor)
@@ -195,32 +189,61 @@ func getDuckyPolished():
 	meshes.get_child(11).material_override = shadowMat
 	meshes.get_child(12).material_override = shadowMat
 	
-	nutrition = foodQuality * 10 / (timeWOFood + 1)
+	var timeGone = saveDataValues.igt - saveDataValues.timeLeftRanch
+	
+	if timeWOFood > 0:
+		timeWOFood = timeWOFood + timeGone
+	
+	food = food - (metabolismSpeed * timeGone)
+	
+	nutrition = ((foodQuality + food / 100) * 5) / (timeWOFood + 1)
+	
+	if saveDataValues.hospitalValues.get(self.name) != null:
+		healthCondition = saveDataValues.hospitalValues.get(self.name).get("healthCondition")
 	
 	defineSelfDictionary()
 	
 	hasPolished = true
 	
 func _physics_process(delta: float) -> void:
+	#Checking to see if should be there or not
 	if saveDataValues.miningValues.get("selectedDuck") == name && saveDataValues.igt - saveDataValues.miningValues.get("duckMiningStartTime") < saveDataValues.miningValues.get("MiningTime"):
-		self.visible = false
-		self.find_child("CollisionShape3D").disabled = true
-		wasInMine = true
+		if wasInMine == false:
+			self.visible = false
+			self.find_child("CollisionShape3D").disabled = true
+			wasInMine = true
 		food = 30
+	#If was not here, but now is out of mine, is now not in mine and plays an animation
 	else:
-		if wasInMine == true:
+		if wasInMine == true && wasInHospital == false:
 			self.visible = true
 			self.find_child("CollisionShape3D").disabled = false
 			$AnimationPlayer.play("Walk Out Of Mine")
 			wasInMine = false
+			saveDataValues.miningValues.selectedDuck = ""
+	
+	#Checking to see if should be there or not, just like mining, but for hospital instead
+	if saveDataValues.hospitalValues.get(self.name) != null && saveDataValues.hospitalValues.get(self.name).get("inHospital") == true:
+		if wasInHospital == false:
+			self.visible = false
+			self.find_child("CollisionShape3D").disabled = true
+			wasInHospital = true
+		food = 100
+	#If was not here, but is now not in hospital and plays an animation
+	if saveDataValues.hospitalValues.get(self.name) != null &&  saveDataValues.hospitalValues.get(self.name).get("timeEntered") + saveDataValues.hospitalValues.get(self.name).get("timeTillLeave") < saveDataValues.igt:
+		saveDataValues.hospitalValues.erase(self.name)
+		self.visible = true
+		self.find_child("CollisionShape3D").disabled = false
+		$AnimationPlayer.play("Walk Out Of Hospital")
+		wasInHospital = false
 	
 	strength = strengthPotential
 	$"3D Selection Gui/SubViewport/Ui Parent/Name".text = self.name
 	
 	#Sets position on floor so no weird collisions make them fly,
-	self.position.y = 0
+	if not is_on_floor():
+		velocity += get_gravity() * delta
 	
-	scale = Vector3(size+0.01,size+0.01,size+0.01)
 	
 	#Used on start to set up the duck when it gets spawned in.
 	if self.get_parent().get_parent().hasCheckedDucks == true && hasPolished == false:
@@ -230,12 +253,13 @@ func _physics_process(delta: float) -> void:
 	selectionBehavior()
 	foodBehavior(delta)
 	movementCheck()
+	emotionBehavior()
 	move_and_slide()
 
-#This Function Also has move(), think(), and turn() inside.
+#This Function Also has healthSetUp(), move(), think(), and turn() inside.
 func ageBehavior(delta):
 	if get_parent().get_parent().find_child("UI Main").firstTime == false:
-		age += delta * 0.01
+		age += delta * 0.1
 	
 	$"3D Selection Gui/SubViewport/Ui Parent/Age".text = str(age).pad_decimals(2)
 	
@@ -248,6 +272,7 @@ func ageBehavior(delta):
 		wasChild = true
 	
 	if age > 7:
+		healthSetUp(delta)
 		if wasChild == true:
 			wasChild = false
 			self.visible = true
@@ -256,10 +281,12 @@ func ageBehavior(delta):
 			velocity.z = 0
 			$CollisionShape3D.disabled = false
 			state = "think"
-		if $AnimationPlayer.current_animation != "Walk Out Of Breeding Center" && $AnimationPlayer.current_animation != "Walk Out Of Mine":
+		if $AnimationPlayer.current_animation != "Walk Out Of Breeding Center" && $AnimationPlayer.current_animation != "Walk Out Of Mine" && $AnimationPlayer.current_animation != "Walk Out Of Hospital":
 			move(delta)
 			think()
 			turn(delta)
+		
+		scale = Vector3(size,size,size)
 	size = overallSize
 
 #This function handles almost all food related behaviors.
@@ -267,34 +294,64 @@ func foodBehavior(delta):
 	get_child(3).get_child(0).get_child(0).get_child(0).value = food #Makes food progress bar equal to how full the duck is.
 	
 	if food > 0 && age > 1:
-		food -= delta / 2
-		nutrition = foodQuality * 10
+		#Will make the duck lose extra food if mildly sick
+		if healthCondition != "":
+			food -= metabolismSpeed * delta
+		food -= metabolismSpeed * delta
+		nutrition = ((foodQuality + food / 100) * 5)
+	#When Duck is an egg, its food must be 100
 	elif age < 1:
 		food = 100
 		nutrition = 10
 	else:
 		food = 0
+		
+		if sadSense > angerSense:
+			sad += delta * (1 + sadSense)
+		else:
+			anger += delta * (1 + angerSense)
+		
 		timeWOFood += delta
-		nutrition = foodQuality * 10 / (timeWOFood + 1)
+		nutrition = -timeWOFood / 50
 
 func fed(foodType: String):
 	if saveDataValues.foodItems.get(foodType) != null && saveDataValues.foodItems.get(foodType) > 0:
 		saveDataValues.foodItems.set(foodType, saveDataValues.foodItems.get(foodType) - 1)
+		$"Quack Sound".stop()
+		$"Quack Sound".play()
+		
+		#Check if food inputted in the function is one of these foods and change the stats based on what food it is
 		if foodType == "Bread":
-			food += 25
+			food += 20
+			saturation -= 0.005
+			refreshDuckColors()
+		if foodType == "Peas":
+			food += 20
 		if foodType == "Watermelon":
-			overallSize += 0.02
 			food += 100
+			overallSize += 0.02
 		if foodType == "Peppers":
-			speed += 0.02
 			food += 30
+			speed += 0.02
 		if foodType == "Sunflower":
+			food += 5
 			value += 0.005
 			refreshDuckColors()
 		if foodType == "Nuts":
-			food += 15
+			food += 25
 			strengthPotential += 0.02
+		if foodType == "Grapes":
+			food += 30
+			saturation += 0.005
+			refreshDuckColors()
+		if foodType == "Vaccine":
+			numOfVacBought += 1
+			addedDiseasePrevention += (1 - (baseHealthiness + addedDiseasePrevention)) / 4
+			if healthCondition == "Mild Cold":
+				healthCondition = ""
+			return
 		
+		#Add food to end of foodList and remove the first one if there is more than 5 in the list after adding food
 		foodList.append(foodType)
 		if foodList.size() > 5:
 			foodList.remove_at(0)
@@ -303,41 +360,178 @@ func fed(foodType: String):
 		var foodUsed = false
 		var tempFoodQuality = 1
 		
+		"""
+		Loop through foodList to check if the duck has been fed the same food as one of the last 5 foods it ate,
+		and if so it will lower the temporary food quality. After looping through the entire list,
+		make temporary food quality the set variable for temporary food quality
+		"""
 		for f in foodList:
+			if f == "Bread":
+				tempFoodQuality -= 0.05
 			for t in tempFoodList:
 				if f == t:
 					foodUsed = true
 			if foodUsed == true:
-				tempFoodQuality -= 0.2
+				tempFoodQuality -= 0.1
 				foodUsed = false
 			else:
 				tempFoodList.append(f)
 		
-		
 		foodQuality = tempFoodQuality
+	
+	if sadSense > angerSense:
+		sad -= 5
+	else:
+		anger -= 5
 	
 	timeWOFood = 0
 	
 	if food > 100:
 		food = 100
 
+#Health Values and getting sick/hurt
+func healthSetUp(delta):
+	#Average Nutrition and Ducks Healthiness to get overall health
+	overallHealth = (nutrition + (baseHealthiness + addedDiseasePrevention) * 10) / 2
+	sickOdds = 200 * (0.5 ** overallHealth)
+	#If not in tutorial && time is greater than the time duck's health should be updated
+	if saveDataValues.igt > timeToCheckDuck && get_parent().get_parent().find_child("UI Main").firstTime == false:
+		#If healthCondition is not maxed out and isn't something random
+		if healthCondition == "" || healthCondition == "Scratched Up" || healthCondition == "Mild Cold":
+			sicknessCheckTime = randf_range(10,40)
+			timeToCheckDuck = saveDataValues.igt + sicknessCheckTime
+			if saveDataValues.spentDictionary.get("Hospital Bill") == null:
+				saveDataValues.spentDictionary.set("Hospital Bill", 0)
+			
+			#If unlucky and duck got sick, give duck sickness relative to what its healthiness is
+			if rand.randf() * 100 < sickOdds:
+				print("Something Happened...")
+				if wasInMine == false:
+					if overallHealth < 3:
+						healthCondition = "Deathly Sick"
+						saveDataValues.hospitalValues.set(self.name, {
+							"timeTillLeave" : 300,
+							"timeEntered" : saveDataValues.igt,
+							"severity" : 3,
+							"healthCondition" : healthCondition,
+							"inHospital" : false
+						})
+						
+					if overallHealth > 3:
+						healthCondition = "Bedridden Sick"
+						saveDataValues.hospitalValues.set(self.name, {
+							"timeTillLeave" : 180,
+							"timeEntered" : saveDataValues.igt,
+							"severity" : 2,
+							"healthCondition" : healthCondition,
+							"inHospital" : false
+						})
+						
+					if overallHealth > 6:
+						healthCondition = "Sick"
+						saveDataValues.hospitalValues.set(self.name, {
+							"timeTillLeave" : 120,
+							"timeEntered" : saveDataValues.igt,
+							"severity" : 1,
+							"healthCondition" : healthCondition,
+							"inHospital" : false
+						})
+						
+					if overallHealth > 8:
+						healthCondition = "Mild Cold"
+	
+	#Change stats based on what the duck's health condition is
+	if healthCondition == "":
+		tempHue = hue
+		tempSaturation = tempSaturation
+	
+	if healthCondition == "Mild Cold":
+		tempHue = move_toward(tempHue, 0.34, delta / 100)
+		tempSaturation = move_toward(tempSaturation, 1, delta / 100)
+		refreshDuckColors()
+		
+		if sadSense > angerSense:
+			sad += delta * sadSense
+		else:
+			anger += delta * angerSense
+		
+	if healthCondition == "Sick":
+		tempHue = move_toward(tempHue, 0.34, delta / 50)
+		tempSaturation = move_toward(tempSaturation, 1, delta / 50)
+		refreshDuckColors()
+		
+		if sadSense > angerSense:
+			sad += delta * (0.5 + sadSense)
+		else:
+			anger += delta * (0.5 + angerSense)
+		
+	if healthCondition == "Bedridden Sick":
+		tempHue = move_toward(tempHue, 0.2, delta / 25)
+		tempSaturation = move_toward(tempSaturation, 1, delta / 25)
+		refreshDuckColors()
+		
+		if strengthPotential >= 0:
+			strengthPotential -= strengthPotential * delta
+		else:
+			strengthPotential = 0
+		
+		if sadSense > angerSense:
+			sad += delta * (0.75 + sadSense)
+		else:
+			anger += delta * (0.75 + angerSense)
+		
+	if healthCondition == "Deathly Sick":
+		tempHue = move_toward(tempHue, 0.2, delta / 10)
+		tempSaturation = move_toward(tempSaturation, 1, delta / 10)
+		refreshDuckColors()
+		
+		if strengthPotential >= 0:
+			strengthPotential -= 0.004 * delta
+		else:
+			strengthPotential = 0
+		
+		if sadSense > angerSense:
+			sad += delta * (1 + sadSense)
+		else:
+			anger += delta * (1 + angerSense)
+
+#Visual changes that are caused by emotions
+func emotionBehavior():
+	if anger > 10:
+		find_child("Ducky Meshes").find_child("Right Eye").mesh = angerEyes
+		find_child("Ducky Meshes").find_child("Right Eye").get_child(0).position = Vector3(0.289, 0.15, 0.183)
+		find_child("Ducky Meshes").find_child("Left Eye").mesh = angerEyes
+		find_child("Ducky Meshes").find_child("Left Eye").get_child(0).position = Vector3(0.332, 0.174, 0.191)
+	elif sad > 10:
+		find_child("Ducky Meshes").find_child("Right Eye").mesh = sadEyes
+		find_child("Ducky Meshes").find_child("Right Eye").get_child(0).position = Vector3(0.394, 0.15, -0.177)
+		find_child("Ducky Meshes").find_child("Left Eye").mesh = sadEyes
+		find_child("Ducky Meshes").find_child("Left Eye").get_child(0).position = Vector3(-0.358, 0.174, 0)
+	else:
+		find_child("Ducky Meshes").find_child("Right Eye").mesh = baseEyes
+		find_child("Ducky Meshes").find_child("Right Eye").get_child(0).position = Vector3(0.439, 0.15, -0.402)
+		find_child("Ducky Meshes").find_child("Left Eye").mesh = baseEyes
+		find_child("Ducky Meshes").find_child("Left Eye").get_child(0).position = Vector3(-0.363, 0.174, -0.454)
+
 #This function handles all the behavior of selecting Ducks.
 func selectionBehavior():
-	#Makes the Duck selected when you click on it, and checks to make sure that no other duck is selected. 
-	if mouseInside == true && Input.is_action_just_pressed("click"):
-		for x in self.get_parent().get_child_count():
-			if get_parent().get_child(x).selected == true:
-				selected = false
-		selected = true
-	
-	#If you click off the Duck & the food panel isn't open, the duck is no longer selected. 
-	if mouseInside == false && Input.is_action_just_pressed("click") && get_parent().get_parent().find_child("Feed Panel").visible == false:
-		selected = false
+	#Can't change selection state of ducks if feeding panel is open
+	if get_parent().get_parent().find_child("Feed Panel").visible == false:
+		#Makes the Duck selected when you click on it, and checks to make sure that no other duck is selected. 
+		if mouseInside == true && Input.is_action_just_pressed("click"):
+			for x in self.get_parent().get_child_count():
+				if get_parent().get_child(x).selected == true:
+					selected = false
+			selected = true
+		
+		#If you click off the Duck & the food panel isn't open, the duck is no longer selected. 
+		if mouseInside == false && Input.is_action_just_pressed("click"):
+			selected = false
 	
 	#If the duck is selected the border around the duck will be white, and if 'F' is pressed, the feed panel will be come visible. 
 	if selected == true:
 		$"3D Selection Gui".visible = true
-		$"3D Selection Gui/SubViewport/Ui Parent/Nutrition".text = str(nutrition).pad_decimals(2)
+		$"3D Selection Gui/SubViewport/Ui Parent/Healthiness".text = str(overallHealth).pad_decimals(2)
 		self.get_child(0).get_child(1).material_override.albedo_color = Color(255,255,255,255)
 		if Input.is_action_just_pressed("F"):
 			self.get_parent().get_parent().find_child("Feed Panel").visible = true
@@ -348,6 +542,7 @@ func selectionBehavior():
 		$"3D Selection Gui".visible = false
 		self.get_child(0).get_child(1).material_override.albedo_color = Color(0,0,0,255)
 
+#If duck's raycasts are colliding, change the state to think
 func movementCheck():
 	var raycast = self.find_child("Raycasts")
 	
@@ -365,7 +560,6 @@ func move(delta):
 		if i >= 2.5:
 			i = 0
 			state = "think"
-			
 		
 		velocity.x = direction.x * speed
 		velocity.z = direction.y * speed
@@ -418,24 +612,30 @@ func defineSelfDictionary():
 	selfDictionary.set("age", age)
 	selfDictionary.set("female", female)
 	selfDictionary.set("hue", hue)
+	selfDictionary.set("tempHue", hue)
 	selfDictionary.set("saturation", saturation)
+	selfDictionary.set("tempSaturation", tempSaturation)
 	selfDictionary.set("value", value)
 	selfDictionary.set("beakHue", beakHue)
 	selfDictionary.set("beakSaturation", beakSaturation)
 	selfDictionary.set("beakValue", beakValue)
-	selfDictionary.set("eyeHue", eyeHue)
-	selfDictionary.set("eyeValue", eyeValue)
 	selfDictionary.set("speed", speed)
 	selfDictionary.set("overallSize", overallSize)
 	selfDictionary.set("food", food)
 	selfDictionary.set("anger", anger)
-	selfDictionary.set("bored", bored)
+	selfDictionary.set("angerSense", angerSense)
 	selfDictionary.set("sad", sad)
+	selfDictionary.set("sadSense", sadSense)
 	selfDictionary.set("timesMined", timesMined)
 	selfDictionary.set("strengthPotential", strengthPotential)
 	selfDictionary.set("strength", strength)
+	
 	selfDictionary.set("foodList", foodList)
 	selfDictionary.set("foodQuality", foodQuality)
+	selfDictionary.set("metabolismSpeed", metabolismSpeed)
+	selfDictionary.set("baseHealthiness", baseHealthiness)
+	selfDictionary.set("foodQuality", foodQuality)
+	selfDictionary.set("addedDiseasePrevention", addedDiseasePrevention)
 
 func refreshDuckColors():
 	"""
@@ -443,7 +643,11 @@ func refreshDuckColors():
 	"""
 	var meshes = self.get_child(0)
 	
-	bodyColor = Color.from_hsv(hue, saturation, value)
+	if healthCondition == "":
+		tempHue = hue
+		tempSaturation = saturation
+	
+	bodyColor = Color.from_hsv(tempHue, tempSaturation, value)
 	
 	mat = mat.duplicate()
 	mat.set_albedo(bodyColor)

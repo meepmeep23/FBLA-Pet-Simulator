@@ -9,11 +9,11 @@ var shadowMaterial = preload("res://Materials/shadowMat.tres")
 
 func _process(_delta: float) -> void:
 	#Stops the building from being selected while in store
-	if self.get_parent().find_child("UI Main").openTab == 1:
+	if self.get_parent().find_child("UI Main").current_tab == 1:
 		selected = false
 	
-	if selected == true && Input.is_action_just_pressed("E"):
-		self.get_parent().find_child("UI Main").openTab = 1
+	if selected == true && Input.is_action_just_pressed("Enter Building"):
+		self.get_parent().find_child("UI Main").current_tab = 1
 	
 	if Input.is_action_just_pressed("click"):
 		if mouseInside == true:
